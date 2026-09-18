@@ -336,3 +336,166 @@ st.info(
     "관객 수의 차이를 비교할 수 있으며, 상자 밖의 점을 통해 해당 장르에서 "
     "특히 많은 관객을 모은 영화도 확인할 수 있습니다."
 )
+# ==============================
+# 6. 첫 주 관객을 반영한 버블 그래프
+# ==============================
+
+st.divider()
+st.header("6. 개봉일 스크린수·총 관객·첫 주 관객의 관계")
+
+# 첫 주 관객 수를 숫자형으로 변환
+df["first_week_audi"] = pd.to_numeric(
+    df["first_week_audi"],
+    errors="coerce"
+).fillna(0)
+
+# 버블 그래프
+fig6 = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    size="first_week_audi",
+    color="genre",
+    hover_name="movieNm",
+    size_max=60,
+    title="첫 주 관객을 반영한 영화별 버블 그래프",
+    labels={
+        "first_scrn": "개봉일 스크린수",
+        "total_audi": "총 관객 수",
+        "first_week_audi": "첫 주 관객 수",
+        "genre": "장르"
+    }
+)
+
+fig6.update_traces(
+    hovertemplate=(
+        "<b>%{hovertext}</b><br>"
+        "장르: %{marker.color}<br>"
+        "개봉일 스크린수: %{x:,.0f}개<br>"
+        "총 관객: %{y:,.0f}명"
+        "<extra></extra>"
+    )
+)
+
+fig6.update_layout(
+    height=650,
+    xaxis_title="개봉일 스크린수",
+    yaxis_title="총 관객 수"
+)
+
+st.plotly_chart(
+    fig6,
+    use_container_width=True,
+    key="graph6_bubble"
+)
+
+st.info(
+    "💡 이 그래프로 알 수 있는 것: "
+    "개봉일 스크린수와 총 관객 수의 관계를 살펴보면서, "
+    "버블 크기를 통해 첫 주에 많은 관객을 모은 영화도 함께 비교할 수 있습니다."
+)
+# ==============================
+# 7. 제작 국가와 장르별 영화 구성
+# ==============================
+
+st.divider()
+st.header("7. 제작 국가에서 장르로 이어지는 영화 구성")
+
+# 제작 국가와 장르의 결측값 처리
+df["nation"] = df["nation"].fillna("기타").astype(str)
+df["genre"] = df["genre"].fillna("기타").astype(str)
+
+# 선버스트 그래프
+fig7 = px.sunburst(
+    df,
+    path=["nation", "genre"],
+    title="제작 국가 → 장르별 영화 편수",
+    labels={
+        "nation": "제작 국가",
+        "genre": "장르"
+    }
+)
+
+fig7.update_traces(
+    hovertemplate=(
+        "<b>%{label}</b><br>"
+        "영화 편수: %{value}편"
+        "<extra></extra>"
+    )
+)
+
+fig7.update_layout(
+    height=650
+)
+
+st.plotly_chart(
+    fig7,
+    use_container_width=True,
+    key="graph7_sunburst"
+)
+
+st.info(
+    "💡 이 그래프로 알 수 있는 것: "
+    "제작 국가별 영화 편수와 각 국가에서 어떤 장르의 영화가 많이 제작되었는지 "
+    "전체적인 구성을 비교할 수 있습니다."
+)
+# ==============================
+# 8. 10위권에 오래 머문 영화는 총 관객도 많은가
+# ==============================
+
+st.divider()
+st.header("8. 10위권에 오래 머문 영화는 총 관객도 많은가")
+
+# 숫자형으로 변환
+df["days_in_top10"] = pd.to_numeric(
+    df["days_in_top10"],
+    errors="coerce"
+).fillna(0)
+
+df["total_audi"] = pd.to_numeric(
+    df["total_audi"],
+    errors="coerce"
+).fillna(0)
+
+# 산점도
+fig8 = px.scatter(
+    df,
+    x="days_in_top10",
+    y="total_audi",
+    color="genre",
+    hover_name="movieNm",
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    labels={
+        "days_in_top10": "10위권에 머문 날수",
+        "total_audi": "총 관객 수",
+        "genre": "장르"
+    }
+)
+
+fig8.update_traces(
+    marker=dict(size=10),
+    hovertemplate=(
+        "<b>%{hovertext}</b><br>"
+        "10위권에 머문 날수: %{x:,.0f}일<br>"
+        "총 관객: %{y:,.0f}명"
+        "<extra></extra>"
+    )
+)
+
+fig8.update_layout(
+    height=600,
+    xaxis_title="10위권에 머문 날수",
+    yaxis_title="총 관객 수"
+)
+
+st.plotly_chart(
+    fig8,
+    use_container_width=True,
+    key="graph8_scatter"
+)
+
+st.info(
+    "💡 이 그래프로 알 수 있는 것: "
+    "영화가 10위권에 머문 날수와 총 관객 수 사이에 어떤 관계가 있는지 "
+    "살펴볼 수 있습니다."
+)
